@@ -48,7 +48,9 @@ export const register = async (req, res) => {
     }
 
     const fileUri = getDataUri(file);
-    const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+    const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+      resource_type: "raw", // important for PDFs
+    });
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -189,7 +191,9 @@ export const updateProfile = async (req, res) => {
 
     if (file) {
       const fileUri = getDataUri(file);
-      const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+      const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+        resource_type: "raw", // important for PDFs
+      });
 
       if (uploadType === "profilePhoto") {
         // Save as profile photo
