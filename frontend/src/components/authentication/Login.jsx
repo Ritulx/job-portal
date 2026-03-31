@@ -42,7 +42,10 @@ const Login = () => {
         toast.success(res.data.message);
       }
     } catch (error) {
-      toast.error("Login failed");
+      const errorMessage = error.response
+        ? error.response.data.message
+        : "An unexpected error occurred.";
+      toast.error(errorMessage);
     } finally {
       dispatch(setLoading(false)); // End loading
     }
