@@ -4,10 +4,22 @@ import { Button } from "../ui/button";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 import { Bookmark } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { addToWishlist, removeFromWishlist } from "@/redux/wishlistSlice";
 
 const Job1 = ({ job }) => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { wishlistJobs } = useSelector((store) => store.wishlist);
+  const isSaved = wishlistJobs.some((wJob) => wJob._id === job?._id);
 
+  const handleWishlistClick = () => {
+    if (isSaved) {
+      dispatch(removeFromWishlist(job._id));
+    } else {
+      dispatch(addToWishlist(job));
+    }
+  };
   const daysAgoFunction = (mongodbTime) => {
     const createdAt = new Date(mongodbTime);
     const currentTime = new Date();
@@ -23,8 +35,8 @@ const Job1 = ({ job }) => {
             ? "Today"
             : `${daysAgoFunction(job?.createdAt)} days ago`}
         </p>
-        <Button variant="outline" className="rounded-full" size="icon">
-          <Bookmark />
+        <Button onClick={handleWishlistClick} variant="outline" className="rounded-full" size="icon">
+          {isSaved ? <Bookmark className="fill-pink-600 text-pink-600" /> : <Bookmark />}
         </Button>
       </div>
 
@@ -62,7 +74,9 @@ const Job1 = ({ job }) => {
         >
           Details
         </Button>
-        <Button className="bg-[#7209b7]">Save For Later</Button>
+        <Button onClick={handleWishlistClick} className={isSaved ? "bg-gray-500" : "bg-[#7209b7]"}>
+          {isSaved ? "Saved" : "Save For Later"}
+        </Button>
       </div>
     </div>
   );

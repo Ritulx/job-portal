@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import Navbar from "./Navbar";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
-import { Contact, Mail, Pen } from "lucide-react";
+import { Contact, Mail, Pen, Bookmark } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Badge } from "../ui/badge";
 import AppliedJob from "./AppliedJob";
 import EditProfileModal from "./EditProfileModal";
@@ -13,6 +14,13 @@ const Profile = () => {
   useGetAppliedJobs();
   const [open, setOpen] = useState(false);
   const { user } = useSelector((store) => store.auth);
+
+  const openResume = () => {
+    if (user?.profile?.resume) {
+      window.open(user.profile.resume, "_blank", "noopener,noreferrer");
+    }
+  };
+
   return (
     <div>
       <Navbar />
@@ -74,14 +82,12 @@ const Profile = () => {
             <label className="text-md font-bold"> Resume</label>
             <div>
               {user?.profile?.resume ? (
-                <a
-                  target="_blank"
-                  href={user?.profile?.resume}
+                <button
+                  onClick={openResume}
                   className="text-pink-600 hover:underline cursor-pointer"
-                  rel="noopener noreferrer"
                 >
-                  Download {user?.profile?.resumeOriginalName}
-                </a>
+                  View / Download {user?.profile?.resumeOriginalName}
+                </button>
               ) : (
                 <span>No Resume Found</span>
               )}
@@ -90,7 +96,15 @@ const Profile = () => {
         </div>
       </div>
       <div className="max-w-4xl mx-auto bg-white rounded-2xl">
-        <h1 className="text-lg my-5 font-bold">Applied Jobs</h1>
+        <div className="flex justify-between items-center my-5">
+          <h1 className="text-lg font-bold">Applied Jobs</h1>
+          <Link to="/wishlist">
+            <Button variant="outline" className="flex items-center gap-2 border-pink-200 hover:bg-pink-50 text-pink-700">
+              <Bookmark className="w-4 h-4 fill-pink-600" />
+              View Saved Jobs
+            </Button>
+          </Link>
+        </div>
 
         {/* Add Application Table */}
         <AppliedJob />

@@ -37,6 +37,10 @@ const ApplicantsTable = () => {
     }
   };
 
+  const downloadResume = (url) => {
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <div>
       <Table>
@@ -60,14 +64,12 @@ const ApplicantsTable = () => {
                 <TableCell>{item?.applicant?.phoneNumber}</TableCell>
                 <TableCell>
                   {item.applicant?.profile?.resume ? (
-                    <a
-                      className="text-pink-600 cursor-pointer"
-                      href={item?.applicant?.profile?.resume}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      onClick={() => downloadResume(item?.applicant?.profile?.resume)}
+                      className="text-pink-600 cursor-pointer hover:underline"
                     >
                       Download {item?.applicant?.profile?.resumeOriginalName}
-                    </a>
+                    </button>
                   ) : (
                     <span>NA</span>
                   )}

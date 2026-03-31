@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
-import { LogOut, User2 } from "lucide-react";
+import { LogOut, User2, Bookmark } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import axios from "axios"; // Import axios
@@ -116,13 +116,22 @@ const Navbar = () => {
 
                 <div className="flex flex-col my-2 text-gray-600  ">
                   {user && user.role === "Student" && (
-                    <div className="flex w-fit items-center gap-2 cursor-pointer">
-                      <User2></User2>
-                      <Button variant="link">
-                        {" "}
-                        <Link to={"/Profile"}> Profile</Link>{" "}
-                      </Button>
-                    </div>
+                    <>
+                      <div className="flex w-fit items-center gap-2 cursor-pointer">
+                        <User2></User2>
+                        <Button variant="link">
+                          {" "}
+                          <Link to={"/Profile"}> Profile</Link>{" "}
+                        </Button>
+                      </div>
+                      <div className="flex w-fit items-center gap-2 cursor-pointer">
+                        <Bookmark></Bookmark>
+                        <Button variant="link">
+                          {" "}
+                          <Link to={"/wishlist"}> Wishlist</Link>{" "}
+                        </Button>
+                      </div>
+                    </>
                   )}
 
                   <div className="flex w-fit items-center gap-2 cursor-pointer">

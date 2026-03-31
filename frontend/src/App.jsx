@@ -18,7 +18,7 @@ import PostJob from "./components/admincomponent/PostJob";
 import Applicants from "./components/admincomponent/Applicants";
 import ProtectedRoute from "./components/admincomponent/ProtectedRoute";
 import Creator from "./components/creator/Creator.jsx";
-
+import Wishlist from "./components/components_lite/Wishlist.jsx";
 const appRouter = createBrowserRouter([
   { path: "/", element: <Home /> },
   {
@@ -60,6 +60,10 @@ const appRouter = createBrowserRouter([
   {
     path:"/Creator",
     element: <Creator/>
+  },
+  {
+    path: "/wishlist",
+    element: <Wishlist />
   },
 
   // /admin
