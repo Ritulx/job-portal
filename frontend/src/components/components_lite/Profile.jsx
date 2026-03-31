@@ -9,8 +9,6 @@ import EditProfileModal from "./EditProfileModal";
 import { useSelector } from "react-redux";
 import useGetAppliedJobs from "@/hooks/useGetAllAppliedJobs";
 
- 
-const isResume = true;
 const Profile = () => {
   useGetAppliedJobs();
   const [open, setOpen] = useState(false);
@@ -75,14 +73,14 @@ const Profile = () => {
           <div className="grid w-full max-w-sm items-center gap-1.5">
             <label className="text-md font-bold"> Resume</label>
             <div>
-              {isResume ? (
+              {user?.profile?.resume ? (
                 <a
                   target="_blank"
                   href={user?.profile?.resume}
                   className="text-pink-600 hover:underline cursor-pointer"
+                  rel="noopener noreferrer"
                 >
-                  Download
-                  {user?.profile?.resumeOriginalName}
+                  Download {user?.profile?.resumeOriginalName}
                 </a>
               ) : (
                 <span>No Resume Found</span>

@@ -66,8 +66,7 @@ const ApplicantsTable = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Download
-                      {/* {item?.applicant?.profile?.resume} */}
+                      Download {item?.applicant?.profile?.resumeOriginalName}
                     </a>
                   ) : (
                     <span>NA</span>
@@ -80,23 +79,23 @@ const ApplicantsTable = () => {
                       <MoreHorizontal />
                     </PopoverTrigger>
                     <PopoverContent className="w-32">
-                       {shortlistingStatus.map((status, index) => {
-                          return (
-                            <div
-                              onClick={() => statusHandler(status, item?._id)}
-                              key={index}
-                              className="flex w-fit items-center my-2 cursor-pointer"
-                            >
-                              <input
-                                type="radio"
-                                name="shortlistingStatus"
-                                value={status}
-                              />{" "}
-                              {status}
-                            </div>
-                          );
-                        })}
-                      </PopoverContent>
+                      {shortlistingStatus.map((status, index) => {
+                        return (
+                          <div
+                            onClick={() => statusHandler(status, item?._id)}
+                            key={index}
+                            className="flex w-fit items-center my-2 cursor-pointer"
+                          >
+                            <input
+                              type="radio"
+                              name="shortlistingStatus"
+                              value={status}
+                            />{" "}
+                            {status}
+                          </div>
+                        );
+                      })}
+                    </PopoverContent>
                   </Popover>
                 </TableCell>
               </tr>
