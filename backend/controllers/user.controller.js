@@ -49,7 +49,8 @@ export const register = async (req, res) => {
 
     const fileUri = getDataUri(file);
     const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
-      resource_type: "raw", // important for PDFs
+      resource_type: "raw",   // 🔥 VERY IMPORTANT
+      type: "upload",         // ensures public access
     });
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -194,7 +195,8 @@ export const updateProfile = async (req, res) => {
       const fileUri = getDataUri(file);
 
       const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
-        resource_type: "raw", // for pdf
+        resource_type: "raw",   // 🔥 VERY IMPORTANT
+        type: "upload",         // ensures public access
       });
 
     if (uploadType === "profilePhoto") {
