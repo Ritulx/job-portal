@@ -20,13 +20,36 @@ const Jobs = () => {
     // Filter based on the searched query across various fields (title, description, etc.)
     const filteredJobs = allJobs.filter((job) => {
       const query = searchedQuery.toLowerCase();
-      return (
+
+      let isTextMatch = false;
+      if (
         job.title?.toLowerCase().includes(query) ||
         job.description?.toLowerCase().includes(query) ||
         job.location?.toLowerCase().includes(query) ||
-        job.experience?.toLowerCase().includes(query) ||
-        job.salary?.toLowerCase().includes(query)
-      );
+        job.jobType?.toLowerCase().includes(query)
+      ) {
+        isTextMatch = true;
+      }
+      
+      let isSalaryMatch = false;
+      if (query.includes("lpa")) {
+        const salaryNum = Number(job.salary);
+        if (query === "0-3 lpa") isSalaryMatch = salaryNum >= 0 && salaryNum <= 3;
+        else if (query === "3-5 lpa") isSalaryMatch = salaryNum > 3 && salaryNum <= 5;
+        else if (query === "5-10 lpa") isSalaryMatch = salaryNum > 5 && salaryNum <= 10;
+        else if (query === "10+ lpa") isSalaryMatch = salaryNum > 10;
+      }
+
+      let isExpMatch = false;
+      if (query.includes("years")) {
+        const expNum = Number(job.experienceLevel);
+        if (query === "0-3 years") isExpMatch = expNum >= 0 && expNum <= 3;
+        else if (query === "3-5 years") isExpMatch = expNum > 3 && expNum <= 5;
+        else if (query === "5-7 years") isExpMatch = expNum > 5 && expNum <= 7;
+        else if (query === "7+ years") isExpMatch = expNum > 7;
+      }
+
+      return isTextMatch || isSalaryMatch || isExpMatch;
     });
 
     setFilterJobs(filteredJobs);

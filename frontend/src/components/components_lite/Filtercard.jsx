@@ -39,7 +39,7 @@ const filterData = [
   },
   {
     filterType: "Salary",
-    array: ["0-50k", "50k-100k", "100k-200k", "200k+"],
+    array: ["0-3 LPA", "3-5 LPA", "5-10 LPA", "10+ LPA"],
   },
 ];
 
