@@ -70,6 +70,7 @@ const EditProfileModal = ({ open, setOpen }) => {
 
       try {
         setLoading(true);
+        console.log("API URL:", `${USER_API_ENDPOINT}/profile/update`);
         const res = await axios.post(
           `${USER_API_ENDPOINT}/profile/update`,
           photoForm,
@@ -102,6 +103,7 @@ const EditProfileModal = ({ open, setOpen }) => {
 
     try {
       setLoading(true);
+      console.log("API URL:", `${USER_API_ENDPOINT}/profile/update`);
       const res = await axios.post(
         `${USER_API_ENDPOINT}/profile/update`,
         formData,
