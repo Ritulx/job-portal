@@ -190,20 +190,28 @@ export const updateProfile = async (req, res) => {
     if (skills) user.profile.skills = skills.split(",");
 
     if (file) {
+      try {
       const fileUri = getDataUri(file);
+
       const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
-        resource_type: "raw", // important for PDFs
+        resource_type: "raw", // for pdf
       });
 
-      if (uploadType === "profilePhoto") {
-        // Save as profile photo
-        user.profile.profilePhoto = cloudResponse.secure_url;
-      } else {
-        // Default: save as resume
-        user.profile.resume = cloudResponse.secure_url;
-        user.profile.resumeOriginalName = file.originalname;
-      }
+    if (uploadType === "profilePhoto") {
+      user.profile.profilePhoto = cloudResponse.secure_url;
+    } else {
+      user.profile.resume = cloudResponse.secure_url;
+      user.profile.resumeOriginalName = file.originalname;
     }
+
+  } catch (error) {
+    console.log("Cloudinary Upload Error:", error);
+    return res.status(500).json({
+      message: "Error uploading file",
+      success: false,
+    });
+  }
+}
 
     await user.save();
 
