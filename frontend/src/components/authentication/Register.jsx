@@ -9,44 +9,27 @@ import { USER_API_ENDPOINT } from "@/utils/data";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "@/redux/authSlice";
+import { Loader2, Briefcase, Upload } from "lucide-react";
 
 const Register = () => {
   const [input, setInput] = useState({
-    fullname: "",
-    email: "",
-    password: "",
-    role: "",
-    phoneNumber: "",
-    pancard: "",
-    adharcard: "",
-    file: "",
+    fullname: "", email: "", password: "", role: "",
+    phoneNumber: "", pancard: "", adharcard: "", file: "",
   });
 
   const navigate = useNavigate();
-
   const dispatch = useDispatch();
+  const { loading, user } = useSelector((store) => store.auth);
 
-  const { loading } = useSelector((store) => store.auth);
-  const changeEventHandler = (e) => {
-    setInput({ ...input, [e.target.name]: e.target.value });
-  };
-  const ChangeFilehandler = (e) => {
-    setInput({ ...input, file: e.target.files?.[0] });
-  };
+  const changeEventHandler = (e) => setInput({ ...input, [e.target.name]: e.target.value });
+  const ChangeFilehandler = (e) => setInput({ ...input, file: e.target.files?.[0] });
 
   const submitHandler = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append("fullname", input.fullname);
-    formData.append("email", input.email);
-    formData.append("password", input.password);
-    formData.append("pancard", input.pancard);
-    formData.append("adharcard", input.adharcard);
-    formData.append("role", input.role);
-    formData.append("phoneNumber", input.phoneNumber);
-    if (input.file) {
-      formData.append("file", input.file);
-    }
+    Object.entries(input).forEach(([key, value]) => {
+      if (value) formData.append(key, value);
+    });
     try {
       dispatch(setLoading(true));
       const res = await axios.post(`${USER_API_ENDPOINT}/register`, formData, {
@@ -58,150 +41,110 @@ const Register = () => {
         toast.success(res.data.message);
       }
     } catch (error) {
-      console.log(error);
-      const errorMessage = error.response
-        ? error.response.data.message
-        : "An unexpected error occurred.";
-      toast.error(errorMessage);
+      toast.error(error.response ? error.response.data.message : "An unexpected error occurred.");
     } finally {
       dispatch(setLoading(false));
     }
   };
 
-  const { user } = useSelector((store) => store.auth);
-  useEffect(() => {
-    if (user) {
-      navigate("/");
-    }
-  }, []);
-  return (
-    <div>
-      <Navbar></Navbar>
-      <div className="flex items-center justify-center max-w-7xl mx-auto">
-        <form
-          onSubmit={submitHandler}
-          className="w-1/2 border border-gray-500 rounded-md p-4 my-10"
-        >
-          <h1 className="font-bold text-xl mb-5 text-center text-pink-600">
-            Register
-          </h1>
-          <div className="my-2">
-            <Label>Fullname</Label>
-            <Input
-              type="text"
-              value={input.fullname}
-              name="fullname"
-              onChange={changeEventHandler}
-              placeholder="John Doe"
-            ></Input>
-          </div>
-          <div className="my-2">
-            <Label>Email</Label>
-            <Input
-              type="email"
-              value={input.email}
-              name="email"
-              onChange={changeEventHandler}
-              placeholder="johndoe@gmail.com"
-            ></Input>
-          </div>
-          <div className="my-2">
-            <Label>Password</Label>
-            <Input
-              type="password"
-              value={input.password}
-              name="password"
-              onChange={changeEventHandler}
-              placeholder="********"
-            ></Input>
-          </div>
-          <div>
-            <Label>PAN Card Number</Label>
-            <Input
-              type="text"
-              value={input.pancard}
-              name="pancard"
-              onChange={changeEventHandler}
-              placeholder="ABCDEF1234G"
-            ></Input>
-          </div>
-          <div>
-            <Label>Adhar Card Number</Label>
-            <Input
-              type="text"
-              value={input.adharcard}
-              name="adharcard"
-              onChange={changeEventHandler}
-              placeholder="123456789012"
-            ></Input>
-          </div>
-          <div className="my-2">
-            <Label>Phone Number</Label>
-            <Input
-              type="tel"
-              value={input.phoneNumber}
-              name="phoneNumber"
-              onChange={changeEventHandler}
-              placeholder="+1234567890"
-            ></Input>
-          </div>
-          <div className="flex items-center justify-between">
-            <RadioGroup className="flex items-center gap-4 my-5 ">
-              <div className="flex items-center space-x-2">
-                <Input
-                  type="radio"
-                  name="role"
-                  value="Student"
-                  checked={input.role === "Student"}
-                  onChange={changeEventHandler}
-                  className="cursor-pointer"
-                />
-                <Label htmlFor="r1">Student</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Input
-                  type="radio"
-                  name="role"
-                  value="Recruiter"
-                  checked={input.role === "Recruiter"}
-                  onChange={changeEventHandler}
-                  className="cursor-pointer"
-                />
-                <Label htmlFor="r2">Recruiter</Label>
-              </div>
-            </RadioGroup>
-          </div>
-          <div className="flex items-center gap-2">
-            <Label>Profile Photo</Label>
-            <Input
-              type="file"
-              accept="image/*"
-              onChange={ChangeFilehandler}
-              className="cursor-pointer"
-            />
-          </div>
-          {loading ? (
-            <div className="flex items-center justify-center my-10">
-              <div className="spinner-border text-pink-600" role="status">
-                <span className="sr-only">Loading...</span>
-              </div>
-            </div>
-          ) : (
-            <button
-              type="submit"
-              className="block w-full py-3 my-3 text-white bg-primary hover:bg-primary/90 rounded-md"
-            >
-              Register
-            </button>
-          )}
+  useEffect(() => { if (user) navigate("/"); }, []);
 
-          <p className="text-gray-500 text-md my-2">
-            Already have an account?{" "}
-            <Link to="/login" className="text-pink-700 font-semibold">
-              Login
-            </Link>
-          </p>
-        </form>
+  const Field = ({ label, name, type = "text", placeholder, required }) => (
+    <div>
+      <label className="text-xs font-semibold text-[#1A0A12] uppercase tracking-wide mb-1.5 block">
+        {label}
+      </label>
+      <Input
+        type={type}
+        name={name}
+        value={input[name]}
+        onChange={changeEventHandler}
+        placeholder={placeholder}
+        className="input-pink w-full"
+        required={required}
+      />
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-[#FDF0F5]">
+      <Navbar />
+      <div className="flex items-center justify-center py-12 px-4">
+        <div className="w-full max-w-lg">
+          <div className="bg-white rounded-3xl border border-[#F2CCDC] shadow-[0_8px_40px_rgba(192,19,106,0.08)] p-8 animate-float-in">
+            {/* Logo */}
+            <div className="flex flex-col items-center mb-8">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#C0136A] to-[#E8A0BF] flex items-center justify-center shadow-md mb-3">
+                <Briefcase className="w-6 h-6 text-white" />
+              </div>
+              <h1 className="font-display text-2xl font-bold text-[#1A0A12]">Create an account</h1>
+              <p className="text-sm text-[#6B3A50] mt-1">Start your career journey today</p>
+            </div>
+
+            <form onSubmit={submitHandler} className="flex flex-col gap-4">
+              <div className="grid grid-cols-2 gap-4">
+                <Field label="Full Name" name="fullname" placeholder="John Doe" />
+                <Field label="Email" name="email" type="email" placeholder="john@example.com" />
+                <Field label="Password" name="password" type="password" placeholder="••••••••" />
+                <Field label="Phone Number" name="phoneNumber" type="tel" placeholder="+91 9876543210" />
+                <Field label="PAN Card" name="pancard" placeholder="ABCDE1234F" />
+                <Field label="Aadhaar Card" name="adharcard" placeholder="1234 5678 9012" />
+              </div>
+
+              {/* Role */}
+              <div>
+                <p className="text-xs font-semibold text-[#1A0A12] uppercase tracking-wide mb-2">I am a</p>
+                <RadioGroup className="flex items-center gap-3">
+                  {["Student", "Recruiter"].map((role) => (
+                    <label
+                      key={role}
+                      className={`flex items-center gap-2 flex-1 cursor-pointer border rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
+                        input.role === role
+                          ? "border-[#C0136A] bg-[#FDF0F5] text-[#C0136A]"
+                          : "border-[#F2CCDC] text-[#6B3A50] hover:border-[#C0136A]/50"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="role"
+                        value={role}
+                        checked={input.role === role}
+                        onChange={changeEventHandler}
+                        className="accent-[#C0136A] w-4 h-4"
+                      />
+                      {role}
+                    </label>
+                  ))}
+                </RadioGroup>
+              </div>
+
+              {/* Profile Photo */}
+              <div>
+                <p className="text-xs font-semibold text-[#1A0A12] uppercase tracking-wide mb-1.5">Profile Photo</p>
+                <label className="flex items-center gap-3 border border-dashed border-[#E8A0BF] rounded-xl px-4 py-3 cursor-pointer hover:bg-[#FDF0F5] transition-colors group">
+                  <Upload className="w-4 h-4 text-[#C0136A] group-hover:scale-110 transition-transform" />
+                  <span className="text-sm text-[#6B3A50]">
+                    {input.file ? input.file.name : "Click to upload photo"}
+                  </span>
+                  <input type="file" accept="image/*" onChange={ChangeFilehandler} className="hidden" />
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 mt-2 bg-[#C0136A] hover:bg-[#9B0E55] text-white font-semibold rounded-xl transition-all duration-300 shadow-md hover:shadow-[0_4px_20px_rgba(192,19,106,0.35)] disabled:opacity-60 flex items-center justify-center gap-2"
+              >
+                {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Creating account...</> : "Create Account"}
+              </button>
+            </form>
+
+            <p className="text-center text-sm text-[#6B3A50] mt-6">
+              Already have an account?{" "}
+              <Link to="/login" className="text-[#C0136A] font-semibold hover:underline">Sign in</Link>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

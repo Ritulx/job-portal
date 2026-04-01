@@ -1,10 +1,6 @@
 import React, { useState } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from "../ui/dialog";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
@@ -13,7 +9,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { USER_API_ENDPOINT } from "@/utils/data";
 import { setUser } from "@/redux/authSlice";
-import { Loader2, Camera } from "lucide-react";
+import { Loader2, Camera, Upload } from "lucide-react";
 import { Avatar, AvatarImage } from "../ui/avatar";
 
 const EditProfileModal = ({ open, setOpen }) => {
@@ -30,25 +26,15 @@ const EditProfileModal = ({ open, setOpen }) => {
     profilePhoto: null,
   });
 
-  // Preview URL for selected profile photo
   const [photoPreview, setPhotoPreview] = useState(user?.profile?.profilePhoto);
-
   const dispatch = useDispatch();
 
-  const changeEventHandler = (e) => {
-    setInput({ ...input, [e.target.name]: e.target.value });
-  };
-
-  const resumeChangeHandler = (e) => {
-    const file = e.target.files?.[0];
-    setInput({ ...input, resume: file });
-  };
-
+  const changeEventHandler = (e) => setInput({ ...input, [e.target.name]: e.target.value });
+  const resumeChangeHandler = (e) => setInput({ ...input, resume: e.target.files?.[0] });
   const photoChangeHandler = (e) => {
     const file = e.target.files?.[0];
     if (file) {
       setInput({ ...input, profilePhoto: file });
-      // Show instant local preview
       setPhotoPreview(URL.createObjectURL(file));
     }
   };
@@ -56,26 +42,20 @@ const EditProfileModal = ({ open, setOpen }) => {
   const submitHandler = async (e) => {
     e.preventDefault();
 
-    // If a new profile photo was selected, upload it first
     if (input.profilePhoto) {
       const photoForm = new FormData();
       photoForm.append("file", input.profilePhoto);
       photoForm.append("uploadType", "profilePhoto");
-      // also send other fields so everything saves in one call
       photoForm.append("fullname", input.fullname || "");
       photoForm.append("email", input.email || "");
       photoForm.append("phoneNumber", input.phoneNumber || "");
       photoForm.append("bio", input.bio || "");
       photoForm.append("skills", input.skills || "");
-
       try {
         setLoading(true);
-        console.log("API URL:", `${USER_API_ENDPOINT}/profile/update`);
-        const res = await axios.post(
-          `${USER_API_ENDPOINT}/profile/update`,
-          photoForm,
-          { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true }
-        );
+        const res = await axios.post(`${USER_API_ENDPOINT}/profile/update`, photoForm, {
+          headers: { "Content-Type": "multipart/form-data" }, withCredentials: true,
+        });
         if (res.data.success) {
           dispatch(setUser(res.data.user));
           toast.success("Profile photo updated!");
@@ -89,7 +69,6 @@ const EditProfileModal = ({ open, setOpen }) => {
       }
     }
 
-    // Upload resume + other fields
     const formData = new FormData();
     formData.append("fullname", input.fullname || "");
     formData.append("email", input.email || "");
@@ -103,12 +82,9 @@ const EditProfileModal = ({ open, setOpen }) => {
 
     try {
       setLoading(true);
-      console.log("API URL:", `${USER_API_ENDPOINT}/profile/update`);
-      const res = await axios.post(
-        `${USER_API_ENDPOINT}/profile/update`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true }
-      );
+      const res = await axios.post(`${USER_API_ENDPOINT}/profile/update`, formData, {
+        headers: { "Content-Type": "multipart/form-data" }, withCredentials: true,
+      });
       if (res.data.success) {
         dispatch(setUser(res.data.user));
         toast.success(res.data.message);
@@ -121,29 +97,40 @@ const EditProfileModal = ({ open, setOpen }) => {
     }
   };
 
+  const fields = [
+    { label: "Full Name", name: "fullname", type: "text" },
+    { label: "Email", name: "email", type: "email" },
+    { label: "Phone", name: "phoneNumber", type: "tel" },
+    { label: "Bio", name: "bio", type: "text" },
+    { label: "Skills (comma separated)", name: "skills", type: "text" },
+  ];
+
   return (
     <Dialog open={open}>
       <DialogContent
-        className="sm:max-w-[500px]"
+        className="sm:max-w-[500px] border-[#F2CCDC] rounded-3xl p-0 overflow-hidden"
         onInteractOutside={() => setOpen(false)}
       >
-        <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
-        </DialogHeader>
+        {/* Header */}
+        <div className="bg-gradient-to-br from-[#FDF0F5] to-white px-6 py-5 border-b border-[#F2CCDC]">
+          <DialogTitle className="font-display text-xl font-bold text-[#1A0A12]">
+            Edit Profile
+          </DialogTitle>
+          <p className="text-xs text-[#6B3A50] mt-0.5">Update your personal information</p>
+        </div>
 
         <form onSubmit={submitHandler}>
-          <div className="grid gap-4 py-4">
+          <div className="px-6 py-5 flex flex-col gap-4">
 
             {/* Profile Photo */}
-            <div className="flex flex-col items-center gap-2 mb-2">
+            <div className="flex flex-col items-center gap-2 mb-1">
               <div className="relative">
-                <Avatar className="h-20 w-20">
+                <Avatar className="h-20 w-20 ring-4 ring-[#F2CCDC]">
                   <AvatarImage src={photoPreview} alt="Profile" />
                 </Avatar>
-                {/* Camera icon overlay */}
                 <label
                   htmlFor="profilePhoto"
-                  className="absolute bottom-0 right-0 bg-pink-600 hover:bg-pink-700 text-white rounded-full p-1.5 cursor-pointer shadow-md"
+                  className="absolute bottom-0 right-0 bg-[#C0136A] hover:bg-[#9B0E55] text-white rounded-full p-1.5 cursor-pointer shadow-md transition-colors"
                 >
                   <Camera className="h-3.5 w-3.5" />
                 </label>
@@ -155,93 +142,60 @@ const EditProfileModal = ({ open, setOpen }) => {
                   className="hidden"
                 />
               </div>
-              <span className="text-xs text-gray-500">Click camera to change photo</span>
+              <span className="text-xs text-[#6B3A50]">Click camera icon to change photo</span>
             </div>
 
-            {/* Name */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Name</Label>
-              <input
-                type="text"
-                name="fullname"
-                value={input.fullname}
-                onChange={changeEventHandler}
-                className="col-span-3 border border-gray-300 rounded-md p-2"
-              />
-            </div>
+            {/* Text Fields */}
+            {fields.map((field) => (
+              <div key={field.name}>
+                <label className="text-xs font-semibold text-[#1A0A12] uppercase tracking-wide mb-1.5 block">
+                  {field.label}
+                </label>
+                <input
+                  type={field.type}
+                  name={field.name}
+                  value={input[field.name] || ""}
+                  onChange={changeEventHandler}
+                  className="w-full border border-[#F2CCDC] bg-[#FDF0F5]/50 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#C0136A]/20 focus:border-[#C0136A] transition-all text-[#1A0A12] placeholder-[#C4849E]"
+                />
+              </div>
+            ))}
 
-            {/* Email */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Email</Label>
-              <input
-                type="email"
-                name="email"
-                value={input.email}
-                onChange={changeEventHandler}
-                className="col-span-3 border border-gray-300 rounded-md p-2"
-              />
+            {/* Resume Upload */}
+            <div>
+              <label className="text-xs font-semibold text-[#1A0A12] uppercase tracking-wide mb-1.5 block">
+                Resume (PDF)
+              </label>
+              <label className="flex items-center gap-3 border border-dashed border-[#E8A0BF] rounded-xl px-4 py-3 cursor-pointer hover:bg-[#FDF0F5] transition-colors group">
+                <Upload className="w-4 h-4 text-[#C0136A] group-hover:scale-110 transition-transform" />
+                <span className="text-sm text-[#6B3A50]">
+                  {input.resume ? input.resume.name : "Upload new resume"}
+                </span>
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  onChange={resumeChangeHandler}
+                  className="hidden"
+                />
+              </label>
             </div>
-
-            {/* Phone */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Phone</Label>
-              <input
-                type="tel"
-                name="phoneNumber"
-                value={input.phoneNumber}
-                onChange={changeEventHandler}
-                className="col-span-3 border border-gray-300 rounded-md p-2"
-              />
-            </div>
-
-            {/* Bio */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Bio</Label>
-              <input
-                type="text"
-                name="bio"
-                value={input.bio}
-                onChange={changeEventHandler}
-                className="col-span-3 border border-gray-300 rounded-md p-2"
-              />
-            </div>
-
-            {/* Skills */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Skills</Label>
-              <input
-                type="text"
-                name="skills"
-                value={input.skills}
-                onChange={changeEventHandler}
-                placeholder="React, Node, CSS"
-                className="col-span-3 border border-gray-300 rounded-md p-2"
-              />
-            </div>
-
-            {/* Resume */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Resume</Label>
-              <input
-                type="file"
-                accept="application/pdf"
-                onChange={resumeChangeHandler}
-                className="col-span-3 border border-gray-300 rounded-md p-2"
-              />
-            </div>
-
           </div>
 
-          <DialogFooter>
-            {loading ? (
-              <Button className="w-full my-4" disabled>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
-              </Button>
-            ) : (
-              <Button type="submit" className="w-full my-4">
-                Save Changes
-              </Button>
-            )}
+          <DialogFooter className="px-6 pb-6">
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="flex-1 py-2.5 border border-[#F2CCDC] text-[#6B3A50] hover:bg-[#FDF0F5] rounded-xl text-sm font-medium transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 py-2.5 bg-[#C0136A] hover:bg-[#9B0E55] text-white font-semibold rounded-xl text-sm transition-all duration-300 shadow-md hover:shadow-[0_4px_16px_rgba(192,19,106,0.3)] disabled:opacity-60 flex items-center justify-center gap-2"
+            >
+              {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : "Save Changes"}
+            </button>
           </DialogFooter>
         </form>
       </DialogContent>

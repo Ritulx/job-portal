@@ -3,10 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
-import { LogOut, User2, Bookmark } from "lucide-react";
+import { LogOut, User2, Bookmark, Briefcase } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
-import axios from "axios"; // Import axios
+import axios from "axios";
 import { setUser } from "@/redux/authSlice";
 import { USER_API_ENDPOINT } from "@/utils/data";
 
@@ -14,6 +14,7 @@ const Navbar = () => {
   const { user } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const logoutHandler = async () => {
     try {
       const res = await axios.post(`${USER_API_ENDPOINT}/logout`, {
@@ -23,131 +24,125 @@ const Navbar = () => {
         dispatch(setUser(null));
         navigate("/");
         toast.success(res.data.message);
-      } else {
-        console.error("Error logging out:", res.data);
       }
     } catch (error) {
-      console.error("Axios error:", error);
-      if (error.response) {
-        console.error("Error response:", error.response.data);
-      }
       toast.error("Error logging out. Please try again.");
     }
   };
+
   return (
-    <div className="bg-white">
-      <div className="flex items-center justify-between mx-auto max-w-7xl h-16">
-        <div>
-          <h1 className="text-2xl font-bold">
-            <span className="text-[#f0a3c8]"> Job </span>{" "}
-            <span className="text-[#cf6799]">Portal</span>
+    <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-[#F2CCDC] shadow-sm">
+      <div className="flex items-center justify-between mx-auto max-w-7xl px-4 h-16">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2 group">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#C0136A] to-[#E8A0BF] flex items-center justify-center shadow-md group-hover:shadow-[0_4px_12px_rgba(192,19,106,0.4)] transition-all duration-300">
+            <Briefcase className="w-4 h-4 text-white" />
+          </div>
+          <h1 className="text-xl font-bold font-display">
+            <span className="text-[#C0136A]">Job</span>
+            <span className="text-[#6B3A50]">Portal</span>
           </h1>
-        </div>
-        <div className="flex items-center gap-10">
-          <ul className="flex font-medium items-center gap-6">
-            {user && user.role === "Recruiter" ? (
-              <>
-                <li>
-                  <Link to={"/admin/companies"}>Companies</Link>
-                </li>
-                <li>
-                  <Link to={"/admin/jobs"}>Jobs</Link>
-                </li>
-              </>
-            ) : (
-              <>
-                <li>
-                  {" "}
-                  <Link to={"/Home"}>Home</Link>
-                </li>
-                <li>
-                  {" "}
-                  <Link to={"/Browse"}>Browse</Link>{" "}
-                </li>
-                <li>
-                  {" "}
-                  <Link to={"/Jobs"}>Jobs</Link>
-                </li>
-                <li>
-                  {" "}
-                  <Link to={"/Creator"}>About</Link>
-                </li>
-              </>
-            )}
-          </ul>
+        </Link>
+
+        {/* Nav Links */}
+        <ul className="flex font-body font-medium items-center gap-1">
+          {user && user.role === "Recruiter" ? (
+            <>
+              <NavLink to="/admin/companies">Companies</NavLink>
+              <NavLink to="/admin/jobs">Jobs</NavLink>
+            </>
+          ) : (
+            <>
+              <NavLink to="/Home">Home</NavLink>
+              <NavLink to="/Browse">Browse</NavLink>
+              <NavLink to="/Jobs">Jobs</NavLink>
+              <NavLink to="/Creator">About</NavLink>
+            </>
+          )}
+        </ul>
+
+        {/* Auth */}
+        <div className="flex items-center gap-3">
           {!user ? (
-            <div className=" flex items-center gap-2">
-              <Link to={"/login"}>
-                {" "}
-                <Button variant="outline">Login</Button>
+            <>
+              <Link to="/login">
+                <button className="btn-outline-pink text-sm">Login</button>
               </Link>
-              <Link to={"/register"}>
-                {" "}
-                <Button className="bg-red-600  hover:bg-red-700">
-                  Register
-                </Button>
+              <Link to="/register">
+                <button className="btn-primary text-sm">Register</button>
               </Link>
-            </div>
+            </>
           ) : (
             <Popover>
               <PopoverTrigger asChild>
-                <Avatar className="cursor-pointer">
-                  <AvatarImage
-                    src={user?.profile?.profilePhoto}
-                    alt="@shadcn"
-                  />
-                </Avatar>
-              </PopoverTrigger>
-              <PopoverContent className="w-80">
-                <div className="flex items-center gap-4 space-y-2">
-                  <Avatar className="cursor-pointer">
-                    <AvatarImage
-                      src={user?.profile?.profilePhoto}
-                      alt="@shadcn"
-                    />
+                <button className="relative rounded-full ring-2 ring-[#F2CCDC] hover:ring-[#C0136A] transition-all duration-300 focus:outline-none">
+                  <Avatar className="cursor-pointer h-9 w-9">
+                    <AvatarImage src={user?.profile?.profilePhoto} alt={user?.fullname} />
                   </Avatar>
-                  <div>
-                    <h3 className="font-medium">{user?.fullname}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {user?.profile?.bio}
-                    </p>
+                  <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-white" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-72 p-0 border border-[#F2CCDC] shadow-xl rounded-2xl overflow-hidden">
+                {/* Header */}
+                <div className="bg-gradient-to-br from-[#FDF0F5] to-white px-4 py-4 border-b border-[#F2CCDC]">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-12 w-12 ring-2 ring-[#E8A0BF]">
+                      <AvatarImage src={user?.profile?.profilePhoto} alt={user?.fullname} />
+                    </Avatar>
+                    <div>
+                      <p className="font-semibold text-[#1A0A12] font-display">{user?.fullname}</p>
+                      <p className="text-xs text-[#6B3A50] mt-0.5 line-clamp-1">{user?.profile?.bio || user?.email}</p>
+                      <span className="inline-block mt-1 text-[10px] font-medium bg-rose-100 text-[#C0136A] px-2 py-0.5 rounded-full">
+                        {user?.role}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col my-2 text-gray-600  ">
-                  {user && user.role === "Student" && (
+                {/* Menu Items */}
+                <div className="py-2 px-2">
+                  {user.role === "Student" && (
                     <>
-                      <div className="flex w-fit items-center gap-2 cursor-pointer">
-                        <User2></User2>
-                        <Button variant="link">
-                          {" "}
-                          <Link to={"/Profile"}> Profile</Link>{" "}
-                        </Button>
-                      </div>
-                      <div className="flex w-fit items-center gap-2 cursor-pointer">
-                        <Bookmark></Bookmark>
-                        <Button variant="link">
-                          {" "}
-                          <Link to={"/wishlist"}> Wishlist</Link>{" "}
-                        </Button>
-                      </div>
+                      <PopMenuItem icon={<User2 className="w-4 h-4" />} to="/Profile" label="My Profile" />
+                      <PopMenuItem icon={<Bookmark className="w-4 h-4" />} to="/wishlist" label="Saved Jobs" />
                     </>
                   )}
-
-                  <div className="flex w-fit items-center gap-2 cursor-pointer">
-                    <LogOut></LogOut>
-                    <Button onClick={logoutHandler} variant="link">
-                      Logout
-                    </Button>
-                  </div>
+                  <button
+                    onClick={logoutHandler}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors duration-200 font-medium mt-1"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </button>
                 </div>
               </PopoverContent>
             </Popover>
           )}
         </div>
       </div>
-    </div>
+    </nav>
   );
 };
+
+const NavLink = ({ to, children }) => (
+  <li>
+    <Link
+      to={to}
+      className="px-3 py-1.5 rounded-full text-sm text-[#6B3A50] hover:text-[#C0136A] hover:bg-rose-50 transition-all duration-200 font-medium"
+    >
+      {children}
+    </Link>
+  </li>
+);
+
+const PopMenuItem = ({ icon, to, label }) => (
+  <Link
+    to={to}
+    className="flex items-center gap-3 px-3 py-2.5 text-sm text-[#1A0A12] hover:bg-[#FDF0F5] hover:text-[#C0136A] rounded-xl transition-colors duration-200 font-medium"
+  >
+    <span className="text-[#C0136A]">{icon}</span>
+    {label}
+  </Link>
+);
 
 export default Navbar;
